@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="huitong" extends="struts-default">
+
+		<action name="adminService" class="com.integration.action.admin.AdminServiceAction">
+			<result name="loginSuc" type="redirect">/info/adminInfo.jsp</result>
+			<result name="input" type="redirect">/adminLogin.jsp</result>
+		</action>
+
+		<action name="saveUser" class="saveUserAction">
+			<result name="success" type="redirect">
+				<param name="actionName">listUser.action</param>
+			</result>
+			<result name="regSuc" type="dispatcher">/info/userInfo.jsp</result>
+		</action>
+
+	</package>
+
+	<!-- 用户登录后才能访问的action -->
+	<package name="authority" extends="struts-default">
+		<interceptors>
+			<interceptor name="authority"
+				class="com.integration.interceptor.AuthorityInterceptor" />
+			<interceptor-stack name="mydefault">
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="authority" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="mydefault"></default-interceptor-ref>
+
+		<global-results>
+			<result name="login">/login.jsp</result>
+		</global-results>
+
+		<!-- order -->
+		<action name="saveOrder" class="saveOrderAction">
+			<result name="success" type="dispatcher">/order/add.jsp</result>
+			<result name="addSuc" type="redirect">orderService</result>
+			<result name="addFail" type="dispatcher">/info/result.jsp</result>
+		</action>
+
+		<action name="orderService" class="orderServiceAction">
+			<result name="success" type="dispatcher">/info/orderInfo.jsp</result>
+			<result name="delSuc" type="dispatcher">/info/result.jsp</result>
+		</action>
+	</package>
+
+	<!-- 管理员后才能访问的action  -->
+	<package name="authorityAdmin" extends="struts-default">
+		<interceptors>
+			<interceptor name="authorityAdmin" class="com.integration.interceptor.AdminInterceptor" />
+			<interceptor-stack name="mydefaultAdmin">
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="authorityAdmin" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="mydefaultAdmin"></default-interceptor-ref>
+
+		<global-results>
+			<result name="login">/adminLogin.jsp</result>
+		</global-results>
+
+		<!-- user -->
+		<action name="listCustomer" class="listCustomerAction">
+			<result name="success">/customer/list.jsp</result>
+		</action>
+
+		<action name="deleteCustomer" class="removeCustomerAction">
+			<result name="success" type="redirect">listCustomer.action</result>
+		</action>
+
+		<action name="updatePCustomer" class="updatePCustomerAction">
+			<result name="success">/customer/update.jsp</result>
+		</action>
+
+		<action name="updateCustomer" class="updateCustomerAction">
+			<result name="success" type="redirect">listCustomer.action</result>
+		</action>
+
+		<!-- admin -->
+		<action name="saveAdmin" class="saveAdminAction">
+			<result name="success" type="redirect">/index.jsp</result>
+		</action>
+
+		<!-- order -->
+		<action name="listOrder" class="listOrderAction">
+			<result name="success" type="dispatcher">/order/list.jsp</result>
+		</action>
+	</package>
+
+</struts>

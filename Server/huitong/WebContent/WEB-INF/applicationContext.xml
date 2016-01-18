@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+
+		<property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+
+		<property name="url">
+			<value>jdbc:mysql://localhost:3306/huitongsys</value>
+		</property>
+
+		<property name="username">
+			<value>root</value>
+		</property>
+
+		<property name="password">
+			<value>root</value>
+		</property>
+
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+
+		<property name="mappingResources">
+			<list>
+				<value>com/integration/entity/Admin.hbm.xml</value>
+				<value>com/integration/entity/Customer.hbm.xml</value>
+				<value>com/integration/entity/Declaration.hbm.xml</value>
+			</list>
+		</property>
+
+
+		<property name="hibernateProperties">
+
+			<props>
+
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">true</prop>
+
+			</props>
+
+		</property>
+
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+
+	<!-- customerDao -->
+	<bean id="customerDao" class="com.integration.dao.impl.CustomerDAOImpl" scope="singleton">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="customerServiceTarget" class="com.integration.service.impl.CustomerServiceImpl">
+		<property name="customerDao" ref="customerDao"></property>
+	</bean>
+
+	<bean id="customerService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+
+		<property name="target" ref="customerServiceTarget"></property>
+		<property name="transactionManager" ref="transactionManager"></property>
+
+		<property name="transactionAttributes">
+
+			<props>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+
+		</property>
+
+	</bean>
+
+	<bean id="saveCustomerAction" class="com.integration.action.customer.SaveCustomerAction"
+		scope="prototype">
+		<property name="service" ref="customerService"></property>
+	</bean>
+
+	<bean id="listCustomerAction" class="com.integration.action.customer.ListCustomerAction"
+		scope="prototype">
+		<property name="service" ref="customerService"></property>
+	</bean>
+
+	<bean id="removeCustomerAction" class="com.integration.action.customer.RemoveCustomerAction"
+		scope="prototype">
+		<property name="service" ref="customerService"></property>
+	</bean>
+
+	<bean id="updatePCustomerAction" class="com.integration.action.customer.UpdatePCustomer"
+		scope="prototype">
+		<property name="service" ref="customerService"></property>
+	</bean>
+
+	<bean id="updateCustomerAction" class="com.integration.action.customer.UpdateCustomerAction"
+		scope="prototype">
+		<property name="service" ref="customerService"></property>
+	</bean>
+
+	<bean id="customerAction" class="com.integration.action.customer.CustomerAction"
+		scope="prototype">
+		<property name="service" ref="customerService"></property>
+	</bean>
+
+	<!-- adminDao -->
+	<bean id="adminDao" class="com.integration.dao.impl.AdminDAOImpl" scope="singleton">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="adminServiceTarget" class="com.integration.service.impl.AdminServiceImpl">
+		<property name="adminDao" ref="adminDao"></property>
+	</bean>
+
+	<bean id="adminService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+
+		<property name="target" ref="adminServiceTarget"></property>
+		<property name="transactionManager" ref="transactionManager"></property>
+
+		<property name="transactionAttributes">
+
+			<props>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+
+		</property>
+
+	</bean>
+
+	<bean id="saveAdminAction" class="com.integration.action.admin.SaveAdminAction"
+		scope="prototype">
+		<property name="adminService" ref="adminService"></property>
+	</bean>
+
+	<bean id="adminServiceAction" class="com.integration.action.admin.AdminServiceAction"
+		scope="prototype">
+		<property name="adminService" ref="adminService"></property>
+	</bean>
+
+	<!-- declarationDao -->
+	<bean id="declarationDao" class="com.integration.dao.impl.DeclarationDAOImpl" scope="singleton">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="declarationServiceTarget" class="com.integration.service.impl.DeclarationServiceImpl">
+		<property name="declarationDao" ref="declarationDao"></property>
+	</bean>
+
+	<bean id="declarationService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+
+		<property name="target" ref="declarationServiceTarget"></property>
+		<property name="transactionManager" ref="transactionManager"></property>
+
+		<property name="transactionAttributes">
+
+			<props>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+
+		</property>
+
+	</bean>
+
+	<bean id="saveDeclarationAction" class="com.integration.action.declaration.SaveDeclarationAction"
+		scope="prototype">
+		<property name="declarationService" ref="declarationService"></property>
+	</bean>
+
+	<bean id="declarationServiceAction" class="com.integration.action.declaration.declarationServiceAction"
+		scope="prototype">
+		<property name="declarationService" ref="declarationService"></property>
+	</bean>
+
+	<bean id="listDeclarationAction" class="com.integration.action.declaration.ListDeclarationAction"
+		scope="prototype">
+		<property name="declarationService" ref="declarationService"></property>
+	</bean>
+
+</beans>
